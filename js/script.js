@@ -3,6 +3,12 @@ let ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 500;
 let keys = [];
+let score = 0;
+
+function updateScore(){
+    let scoreCard = document.getElementById('scoreCard');
+    scoreCard.innerText = "The score is : "+ score;
+}
 
 let player = {
     X: 0,
@@ -18,6 +24,11 @@ let player = {
 let playerSprite = new Image();
 playerSprite.src = './images/bahamut.png';
 
+let pokeball = new Image();
+pokeball.src = './images/pokeball.png';
+pokeball.height = 96;
+pokeball.width = 96;
+
 
 let background = new Image();
 background.src = './images/background.png';
@@ -26,6 +37,23 @@ function drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH){
     ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
 
 }
+//for random x axis value 
+function getRndInteger(minWidth, maxWidth){
+    return Math.floor(Math.random()*(maxWidth-minWidth) ) + minWidth;
+}
+//for random x axis value 
+function getRndInteger(minHeight, maxHeight){
+    return Math.floor(Math.random()*(maxHeight-minHeight) ) + minHeight;
+}
+//for pokemon rendering
+function drawPokeball(img, x,y,w,h){
+    ctx.drawImage(img, x,y,w,h);
+}
+//position of rand pokeballs
+let pokeball1PosX = getRndInteger(0,800-pokeball.width);
+let pokeball1PosY = getRndInteger(0,500-pokeball.height);
+let pokeball2PosX = getRndInteger(0,800-pokeball.width);
+let pokeball2PosY = getRndInteger(0,500-pokeball.height);
 
 
 //event listener for key down and keyup
@@ -73,21 +101,10 @@ function handlePlayerMotion(){
     //call it in the animate function
 }
 
-/* //animation loop
-function animate() {
-    ctx.clearRect(0,0, canvas.width, canvas.height);
-    ctx.drawImage(background,0,0, canvas.width, canvas.height);
-    drawSprite(playerSprite, player.width * player.frameX, player.height * player.frameY, player.width, player.height, player.X, player.Y, player.width, player.height);
-    moveThePlayer();
-    handlePlayerMotion();
-    requestAnimationFrame(animate);
-}
-animate();//speed is too fast for this so we need a consistent animator for every screen irrespective of the render or fps capability of the user's computer
- */
 
  //now we will use custom animator to have a consistent fps across multilpe devices
 
-let fps, intervalOfFps, initTime, currentTime, afterTime, goneTime;
+let fps, intervalOfFps, initTime, currentTime, afterTime, goneTime, spawnRate = 3000, lastSpawn = -1;
 
 function startAnimation(fps){
     intervalOfFps = 1000/fps; //how long we will wait before we serve the next frame
@@ -97,19 +114,60 @@ function startAnimation(fps){
     animate();
 
 }
-
+//animation loop
 function animate(){
     requestAnimationFrame(animate);
     currentTime = Date.now();
     goneTime = currentTime - afterTime; 
+    
     if(goneTime > intervalOfFps){
+        
         afterTime = currentTime - (goneTime % intervalOfFps);
         ctx.clearRect(0,0, canvas.width, canvas.height);
         ctx.drawImage(background,0,0, canvas.width, canvas.height);
         drawSprite(playerSprite, player.width * player.frameX, player.height * player.frameY, player.width, player.height, player.X, player.Y, player.width, player.height);
+        //I am using 2 pokeballs at random place and using them for scoring
+        
+        
+        // for ball 1
+        drawPokeball(pokeball, pokeball1PosX, pokeball1PosY, pokeball.width, pokeball.height);
+        if(Math.abs(pokeball1PosX-player.X) <=40  && Math.abs(pokeball1PosY - player.Y) <=40){
+            score ++;
+            updateScore();
+            pokeball1PosX = getRndInteger(0,800-pokeball.width);
+            pokeball1PosY = getRndInteger(0,500-pokeball.height)
+            if(Math.abs(pokeball1PosX - pokeball2PosX >=96) && Math.abs(pokeball1PosY - pokeball2PosY >=96) ){
+                pokeball1PosX = getRndInteger(0,800-pokeball.width);
+                pokeball1PosY = getRndInteger(0,500-pokeball.height);
+                drawPokeball(pokeball, pokeball1PosX, pokeball1PosY, pokeball.width, pokeball.height);
+                
+            }else{
+                drawPokeball(pokeball, pokeball1PosX, pokeball1PosY, pokeball.width, pokeball.height);
+            }
+            
+        }
+        //for ball 2
+        drawPokeball(pokeball, pokeball2PosX, pokeball2PosY, pokeball.width, pokeball.height);
+        if(Math.abs(pokeball2PosX-player.X) <=40  && Math.abs(pokeball2PosY - player.Y) <=40){
+            score++;
+            updateScore();
+            pokeball2PosX = getRndInteger(0,800-pokeball.width);
+            pokeball2PosY = getRndInteger(0,500-pokeball.height)
+            if(Math.abs(pokeball1PosX - pokeball2PosX >=96) && Math.abs(pokeball1PosY - pokeball2PosY >=96) ){
+                pokeball2PosX = getRndInteger(0,800-pokeball.width);
+                pokeball2PosY = getRndInteger(0,500-pokeball.height);
+                drawPokeball(pokeball, pokeball2PosX, pokeball2PosY, pokeball.width, pokeball.height);
+                
+            }else{
+                drawPokeball(pokeball, pokeball2PosX, pokeball2PosY, pokeball.width, pokeball.height);
+            }
+            drawPokeball(pokeball, pokeball2PosX, pokeball2PosY, pokeball.width, pokeball.height);
+        }
+        
         moveThePlayer();
         handlePlayerMotion();
     }
 }
 
-startAnimation(30);
+startAnimation(25);
+
