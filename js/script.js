@@ -1,15 +1,17 @@
-let canvas = document.getElementById('cvs');
-let ctx = canvas.getContext('2d');
+let canvas = document.getElementById('cvs');//canvas api
+let ctx = canvas.getContext('2d');//context as the img are 2d so 2d
 canvas.width = 800;
 canvas.height = 500;
-let keys = [];
-let score = 0;
+let keys = [];//key logger
+let score = 0;//score counter
 
+//score update function
 function updateScore(){
     let scoreCard = document.getElementById('scoreCard');
     scoreCard.innerText = "The score is : "+ score;
 }
 
+//player sprite one frame
 let player = {
     X: 0,
     Y: 0,
@@ -21,18 +23,21 @@ let player = {
     moving: false
 }
 
+//entire sprite image
 let playerSprite = new Image();
 playerSprite.src = './images/bahamut.png';
 
+//the given pokeball image
 let pokeball = new Image();
 pokeball.src = './images/pokeball.png';
 pokeball.height = 96;
 pokeball.width = 96;
 
-
+//a slolid black bg
 let background = new Image();
 background.src = './images/background.png';
 
+//draw function for the sprite of player the part to cutout from sprite
 function drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH){
     ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
 
@@ -65,8 +70,10 @@ window.addEventListener('keyup', function(e){
     delete keys[e.keyCode];
     player.moving = false; //when movement stops or key is released make the player stable
 });
+//end event listeners
 
 
+//for movement to key binding
 function moveThePlayer(){
     //up movement
     if(keys[38] && player.Y>10){
@@ -169,5 +176,5 @@ function animate(){
     }
 }
 
-startAnimation(25);
+startAnimation(30);//tell us the number of frames you want
 
